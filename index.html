@@ -1,29 +1,615 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8">
-        <title>Hello-I-am-Suraj</title>
-		<style>
-			body {
-				background-color: rgb(146, 184, 233);
-			}
-		
-			#header {
-				color: blue;
-				text-align: center;
-				font-size: 3em;
-			}
-			#suraj-pic {
-				border: 10px ridge blue;
-				
-			}
-		</style>
-	</head>
-		
-		<body>
-			<h1 id="header">Suraj</h1>
-			<img alt="suraj doing gym" id="suraj-pic" width="200" src="https://i.ytimg.com/vi/vyvewOMbsQo/oar2.jpg?sqp=-oaymwEoCJUDENAFSFqQAgHyq4qpAxcIARUAAIhC2AEB4gEKCBgQAhgGOAFAAQ==&rs=AOn4CLAJlPBM9Aq7esK-6-oKLQf-yRk8BA">
-		</body>
-		
-	
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mini Shop — Demo E-commerce Page</title>
+  <meta name="description" content="Simple responsive e-commerce product page demo with cart" />
+  <style>
+    :root{
+      --bg:#0f1724;
+      --card:#0b1220;
+      --muted:#9aa4b2;
+      --accent:#06b6d4;
+      --accent-2:#7c3aed;
+      --glass: rgba(255,255,255,0.03);
+      --success:#10b981;
+      --danger:#ef4444;
+      --max-width:1200px;
+      --radius:12px;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background: linear-gradient(180deg,#071025 0%, #081827 55%, #04121b 100%);
+      color:#e6eef6;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      padding:32px;
+      display:flex;
+      justify-content:center;
+      align-items:flex-start;
+      gap:24px;
+      min-height:100vh;
+    }
+
+    .container{
+      width:100%;
+      max-width:var(--max-width);
+      display:grid;
+      grid-template-columns: 1fr 360px;
+      gap:24px;
+      align-items:start;
+    }
+
+    /* MAIN PANEL */
+    main.panel{
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius: var(--radius);
+      padding:20px;
+      box-shadow: 0 6px 30px rgba(2,6,23,0.6);
+      min-height:70vh;
+      overflow:hidden;
+    }
+
+    header.top{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:14px;
+    }
+    .brand{
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+    .logo{
+      width:48px;
+      height:48px;
+      border-radius:10px;
+      display:grid;
+      place-items:center;
+      font-weight:700;
+      color:#021122;
+      background: linear-gradient(135deg,var(--accent),var(--accent-2));
+      box-shadow: 0 4px 18px rgba(124,58,237,0.18);
+    }
+    .title{
+      font-size:18px;
+      line-height:1;
+    }
+    .subtitle{color:var(--muted); font-size:13px}
+
+    .controls{
+      display:flex;
+      gap:8px;
+      align-items:center;
+    }
+    input.search{
+      padding:10px 12px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,0.04);
+      background:var(--glass);
+      color:inherit;
+      min-width:220px;
+      outline:none;
+    }
+    .filter-group{
+      display:flex;
+      gap:8px;
+      align-items:center;
+    }
+    select, button.btn{
+      padding:9px 12px;
+      border-radius:10px;
+      border: none;
+      background: rgba(255,255,255,0.03);
+      color:inherit;
+      cursor:pointer;
+      font-weight:600;
+    }
+    button.btn.primary{
+      background: linear-gradient(90deg,var(--accent),var(--accent-2));
+      color:#021122;
+      box-shadow: 0 6px 20px rgba(6,182,212,0.12);
+    }
+    .meta{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    /* PRODUCT GRID */
+    .products{
+      margin-top:14px;
+      display:grid;
+      grid-template-columns: repeat(auto-fill,minmax(220px,1fr));
+      gap:16px;
+    }
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:12px;
+      padding:12px;
+      border:1px solid rgba(255,255,255,0.03);
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      transition:transform .18s ease, box-shadow .18s ease;
+    }
+    .card:hover{ transform:translateY(-6px); box-shadow:0 10px 30px rgba(2,6,23,0.6) }
+    .thumb{
+      height:150px;
+      border-radius:10px;
+      background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+    }
+    .thumb img{ max-width:100%; max-height:100%; object-fit:cover; display:block }
+
+    .info{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      flex:1;
+    }
+    .product-title{ font-weight:700; font-size:15px }
+    .product-meta{ color:var(--muted); font-size:13px; display:flex; gap:8px; align-items:center }
+    .price{ font-weight:800; color:var(--accent-2); font-size:16px }
+
+    .card-actions{
+      display:flex;
+      gap:8px;
+      margin-top:auto;
+      align-items:center;
+    }
+    button.icon{
+      background:rgba(255,255,255,0.03);
+      border:none;
+      padding:8px 10px;
+      border-radius:10px;
+      color:inherit;
+      cursor:pointer;
+    }
+
+    /* CART SIDEBAR */
+    aside.cart{
+      position:sticky;
+      top:32px;
+      height:calc(100vh - 64px);
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:var(--radius);
+      padding:12px;
+      width:100%;
+      max-width:360px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      border:1px solid rgba(255,255,255,0.03);
+    }
+    .cart h3{ margin:0; font-size:18px }
+    .cart-list{ flex:1; overflow:auto; padding-right:6px; display:flex; flex-direction:column; gap:10px }
+    .cart-item{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      padding:8px;
+      border-radius:10px;
+      background: rgba(255,255,255,0.01);
+    }
+    .ci-thumb{ width:60px; height:60px; border-radius:8px; overflow:hidden; background:#031220; display:grid; place-items:center; }
+    .ci-thumb img{ width:100%; height:100%; object-fit:cover }
+    .ci-body{ flex:1 }
+    .ci-title{ font-weight:700; font-size:14px }
+    .ci-meta{ color:var(--muted); font-size:13px; display:flex; gap:8px; align-items:center }
+    .qty-controls{ display:flex; gap:6px; align-items:center; margin-top:6px }
+    .qty-controls button{ width:28px; height:28px; border-radius:8px; background:rgba(255,255,255,0.03); border:none; cursor:pointer; color:inherit }
+    .checkout{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      justify-content:space-between;
+      padding-top:8px;
+      border-top:1px dashed rgba(255,255,255,0.03);
+    }
+    .empty{ color:var(--muted); font-size:14px; text-align:center; padding:20px 6px }
+
+    /* Modal */
+    .modal-backdrop{
+      position:fixed;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:60;
+      background:linear-gradient(0deg, rgba(0,0,0,0.55), rgba(0,0,0,0.55));
+    }
+    .modal{
+      width:92%;
+      max-width:920px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:14px;
+      padding:20px;
+      box-shadow:0 18px 60px rgba(2,6,23,0.6);
+      display:flex;
+      gap:16px;
+      color:inherit;
+    }
+    .modal .left{ flex:1; min-width:260px }
+    .modal .right{ width:340px; display:flex; flex-direction:column; gap:10px }
+    .modal .thumb{ height:320px; border-radius:12px; }
+    .close-btn{ background:transparent; border:none; color:var(--muted); font-size:20px; cursor:pointer; }
+
+    /* Responsive */
+    @media (max-width:980px){
+      .container{ grid-template-columns: 1fr; padding-bottom:100px }
+      aside.cart{ position:relative; top:auto; height:auto; max-width:none }
+      .modal{ flex-direction:column }
+      .controls input.search{ min-width:140px }
+    }
+  </style>
+</head>
+<body>
+  <div class="container" role="main">
+    <main class="panel" aria-labelledby="shop-title">
+      <header class="top">
+        <div class="brand">
+          <div class="logo" aria-hidden="true">MS</div>
+          <div>
+            <div id="shop-title" class="title">Mini Shop</div>
+            <div class="subtitle">Modern demo storefront</div>
+          </div>
+        </div>
+
+        <div class="controls" aria-hidden="false">
+          <input id="q" class="search" type="search" placeholder="Search products, e.g. sneakers" aria-label="Search products" />
+          <div class="filter-group">
+            <select id="category">
+              <option value="">All categories</option>
+            </select>
+            <select id="sort">
+              <option value="featured">Featured</option>
+              <option value="price-asc">Price: Low → High</option>
+              <option value="price-desc">Price: High → Low</option>
+            </select>
+            <button id="clear" class="btn" title="Clear filters">Clear</button>
+          </div>
+        </div>
+      </header>
+
+      <div class="meta">
+        <div id="results-count">Showing all products</div>
+        <div style="margin-left:auto;color:var(--muted);font-size:13px">Free demo checkout • No real payments</div>
+      </div>
+
+      <section class="products" id="products" aria-live="polite">
+        <!-- product cards injected by JS -->
+      </section>
+    </main>
+
+    <aside class="cart" aria-labelledby="cart-title">
+      <h3 id="cart-title">Your Cart</h3>
+      <div id="cart-list" class="cart-list" role="list">
+        <div class="empty">Your cart is empty — add items from the shop</div>
+      </div>
+
+      <div class="checkout">
+        <div>
+          <div style="color:var(--muted);font-size:13px">Subtotal</div>
+          <div id="subtotal" style="font-weight:800;font-size:18px">₹0.00</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button id="checkout-btn" class="btn primary">Checkout</button>
+          <button id="empty-btn" class="btn" style="background:transparent;border:1px solid rgba(255,255,255,0.03)">Empty</button>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Modal -->
+  <div id="modal-backdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal" role="document">
+      <div class="left">
+        <button id="modal-close" class="close-btn" aria-label="Close">&times;</button>
+        <div class="thumb" id="modal-thumb"></div>
+      </div>
+      <div class="right">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div id="modal-title" style="font-weight:800;font-size:18px"></div>
+            <div id="modal-cat" style="color:var(--muted);font-size:13px"></div>
+          </div>
+        </div>
+        <div id="modal-desc" style="color:var(--muted);font-size:14px"></div>
+        <div id="modal-price" style="font-size:20px;font-weight:800;color:var(--accent-2)"></div>
+        <div style="display:flex;gap:8px;margin-top:auto">
+          <button id="modal-add" class="btn primary">Add to cart</button>
+          <button id="modal-close-2" class="btn">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* -------------------------
+       Sample product data
+       Edit or extend this array to add your own items.
+       Images use unsplash placeholders for demo.
+    -------------------------*/
+    const products = [
+      { id: "p1", title: "Atlas Sneakers", price: 3499, category:"Footwear", img:"https://images.unsplash.com/photo-1585386959984-a4155227c8d9?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=1" , desc:"Street-ready sneakers with cushioned sole."},
+      { id: "p2", title: "Nimbus Hoodie", price: 1999, category:"Apparel", img:"https://images.unsplash.com/photo-1512436991641-6745cdb1723f?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=2", desc:"Ultra-soft cotton hoodie for everyday comfort."},
+      { id: "p3", title: "Aurora Backpack", price: 2599, category:"Accessories", img:"https://images.unsplash.com/photo-1533658925621-8bb1a6d6f019?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=3", desc:"Water-resistant pack with laptop sleeve."},
+      { id: "p4", title: "Sol Sunglasses", price: 1299, category:"Accessories", img:"https://images.unsplash.com/photo-1520975698514-3a2c639f4c62?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=4", desc:"Polarized lenses with modern frames."},
+      { id: "p5", title: "Comet Tee", price: 799, category:"Apparel", img:"https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=5", desc:"Lightweight breathable tee."},
+      { id: "p6", title: "Trail Runner", price: 4299, category:"Footwear", img:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=6", desc:"Performance shoes built for trails."},
+    ];
+
+    /* -------------------------
+       State & helpers
+    -------------------------*/
+    let state = {
+      q: "",
+      category: "",
+      sort: "featured",
+      cart: JSON.parse(localStorage.getItem("mini_cart") || "{}")
+    };
+
+    function saveCart(){
+      localStorage.setItem("mini_cart", JSON.stringify(state.cart));
+      renderCart();
+    }
+
+    function currency(n){
+      // Indian Rupee symbol used — change as needed
+      return "₹" + Number(n).toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2});
+    }
+
+    /* -------------------------
+       Init category filter
+    -------------------------*/
+    const categoryEl = document.getElementById("category");
+    const allCats = Array.from(new Set(products.map(p=>p.category)));
+    allCats.forEach(cat=>{
+      const opt = document.createElement("option");
+      opt.value = cat; opt.textContent = cat;
+      categoryEl.appendChild(opt);
+    });
+
+    /* -------------------------
+       Render products
+    -------------------------*/
+    const productsEl = document.getElementById("products");
+    function renderProducts(){
+      const q = state.q.trim().toLowerCase();
+      let list = products.filter(p=>{
+        if(state.category && p.category !== state.category) return false;
+        if(!q) return true;
+        return (p.title + " " + (p.desc||"") + " " + p.category).toLowerCase().includes(q);
+      });
+
+      if(state.sort === "price-asc") list.sort((a,b)=>a.price-b.price);
+      if(state.sort === "price-desc") list.sort((a,b)=>b.price-a.price);
+      // else featured keep original order
+
+      productsEl.innerHTML = "";
+      document.getElementById("results-count").textContent = `Showing ${list.length} product${list.length!==1?"s":""}`;
+
+      if(list.length===0){
+        productsEl.innerHTML = `<div style="grid-column:1/-1;color:var(--muted);padding:30px;border-radius:10px;background:rgba(255,255,255,0.01);text-align:center">No products match your filters</div>`;
+        return;
+      }
+
+      list.forEach(p=>{
+        const card = document.createElement("article");
+        card.className = "card";
+        card.innerHTML = `
+          <div class="thumb" aria-hidden="true"><img loading="lazy" src="${p.img}" alt="${escapeHtml(p.title)}"></div>
+          <div class="info">
+            <div style="display:flex;justify-content:space-between;gap:10px">
+              <div class="product-title">${escapeHtml(p.title)}</div>
+              <div class="price">${currency(p.price)}</div>
+            </div>
+            <div class="product-meta"><span>${escapeHtml(p.category)}</span><span> • </span><span style="color:var(--muted)">${truncate(p.desc||"",60)}</span></div>
+          </div>
+          <div class="card-actions">
+            <button class="icon" data-action="view" aria-label="Quick view ${escapeHtml(p.title)}">👁️ View</button>
+            <button class="icon" data-action="add" aria-label="Add ${escapeHtml(p.title)} to cart">➕ Add</button>
+          </div>
+        `;
+        // event delegation below
+        productsEl.appendChild(card);
+
+        card.querySelector('[data-action="view"]').addEventListener('click', ()=> openModal(p.id));
+        card.querySelector('[data-action="add"]').addEventListener('click', ()=> {
+          addToCart(p.id,1);
+        });
+      });
+    }
+
+    /* -------------------------
+       Cart functions
+    -------------------------*/
+    function addToCart(pid, qty=1){
+      const existing = state.cart[pid] || 0;
+      state.cart[pid] = existing + qty;
+      saveCart();
+      animateAdd();
+    }
+
+    function removeFromCart(pid){
+      delete state.cart[pid];
+      saveCart();
+    }
+
+    function changeQty(pid, qty){
+      if(qty <= 0) removeFromCart(pid);
+      else state.cart[pid] = qty;
+      saveCart();
+    }
+
+    function cartItems(){
+      return Object.entries(state.cart).map(([pid,qty])=>{
+        const product = products.find(p=>p.id===pid);
+        return { product, qty };
+      }).filter(i=>i.product);
+    }
+
+    function renderCart(){
+      const el = document.getElementById("cart-list");
+      el.innerHTML = "";
+      const items = cartItems();
+      if(items.length === 0){
+        el.innerHTML = `<div class="empty">Your cart is empty — add items from the shop</div>`;
+        document.getElementById("subtotal").textContent = currency(0);
+        return;
+      }
+      let subtotal = 0;
+      items.forEach(({product,qty})=>{
+        subtotal += product.price * qty;
+        const item = document.createElement("div");
+        item.className = "cart-item";
+        item.innerHTML = `
+          <div class="ci-thumb"><img src="${product.img}" alt="${escapeHtml(product.title)}"></div>
+          <div class="ci-body">
+            <div class="ci-title">${escapeHtml(product.title)}</div>
+            <div class="ci-meta">${currency(product.price)} • ${product.category}</div>
+            <div class="qty-controls">
+              <button class="qty-dec" aria-label="Decrease quantity">−</button>
+              <div style="min-width:30px;text-align:center">${qty}</div>
+              <button class="qty-inc" aria-label="Increase quantity">+</button>
+              <button class="btn" style="margin-left:8px;padding:6px 8px;font-size:13px" data-remove>Remove</button>
+            </div>
+          </div>
+        `;
+        item.querySelector('.qty-dec').addEventListener('click', ()=> changeQty(product.id, qty-1));
+        item.querySelector('.qty-inc').addEventListener('click', ()=> changeQty(product.id, qty+1));
+        item.querySelector('[data-remove]').addEventListener('click', ()=> removeFromCart(product.id));
+        el.appendChild(item);
+      });
+      document.getElementById("subtotal").textContent = currency(subtotal);
+    }
+
+    /* -------------------------
+       Modal (quick view)
+    -------------------------*/
+    const backdrop = document.getElementById("modal-backdrop");
+    function openModal(pid){
+      const p = products.find(x=>x.id===pid); if(!p) return;
+      document.getElementById("modal-title").textContent = p.title;
+      document.getElementById("modal-cat").textContent = p.category;
+      document.getElementById("modal-desc").textContent = p.desc || "";
+      document.getElementById("modal-price").textContent = currency(p.price);
+      const thumb = document.getElementById("modal-thumb");
+      thumb.innerHTML = `<img src="${p.img}" alt="${escapeHtml(p.title)}" style="width:100%;height:100%;object-fit:cover;border-radius:8px">`;
+      backdrop.style.display = "flex";
+      backdrop.setAttribute("aria-hidden","false");
+      // attach add handler
+      document.getElementById("modal-add").onclick = ()=> {
+        addToCart(p.id,1);
+        closeModal();
+      };
+    }
+    function closeModal(){
+      backdrop.style.display = "none";
+      backdrop.setAttribute("aria-hidden","true");
+    }
+
+    document.getElementById("modal-close").addEventListener('click', closeModal);
+    document.getElementById("modal-close-2").addEventListener('click', closeModal);
+    backdrop.addEventListener('click', (e)=> { if(e.target === backdrop) closeModal(); });
+
+    /* -------------------------
+       UI: search/filter/sort
+    -------------------------*/
+    const qEl = document.getElementById("q");
+    qEl.addEventListener('input', (e)=> {
+      state.q = e.target.value;
+      renderProducts();
+    });
+    categoryEl.addEventListener('change', (e)=> {
+      state.category = e.target.value;
+      renderProducts();
+    });
+    document.getElementById("sort").addEventListener('change', (e)=> {
+      state.sort = e.target.value;
+      renderProducts();
+    });
+    document.getElementById("clear").addEventListener('click', ()=> {
+      state.q = "";
+      state.category = "";
+      state.sort = "featured";
+      qEl.value = "";
+      categoryEl.value = "";
+      document.getElementById("sort").value = "featured";
+      renderProducts();
+    });
+
+    /* -------------------------
+       Empty / Checkout buttons
+    -------------------------*/
+    document.getElementById("empty-btn").addEventListener('click', ()=>{
+      if(confirm("Empty your cart?")) { state.cart = {}; saveCart(); }
+    });
+    document.getElementById("checkout-btn").addEventListener('click', ()=>{
+      const items = cartItems();
+      if(items.length === 0){ alert("Your cart is empty"); return; }
+      // Demo checkout flow (no real payments)
+      let text = "You're checking out the following items:\\n\\n";
+      items.forEach(({product,qty})=>{
+        text += `${product.title} x ${qty} — ${currency(product.price * qty)}\\n`;
+      });
+      text += `\\nSubtotal: ${document.getElementById("subtotal").textContent}\\n\\nThis is a demo. Press OK to simulate order placement.`;
+      if(confirm(text)){
+        alert("Order placed — thanks! (Demo)");
+        state.cart = {};
+        saveCart();
+      }
+    });
+
+    /* -------------------------
+       Utilities
+    -------------------------*/
+    function truncate(s,n){ return s.length>n ? s.slice(0,n-1) + "…" : s; }
+    function escapeHtml(s){ return s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;'); }
+
+    /* Simple animation when adding to cart */
+    function animateAdd(){
+      const el = document.createElement('div');
+      el.textContent = "Added ✓";
+      el.style.position = "fixed";
+      el.style.right = "24px";
+      el.style.bottom = "24px";
+      el.style.padding = "10px 14px";
+      el.style.background = "linear-gradient(90deg,var(--accent),var(--accent-2))";
+      el.style.color = "#021122";
+      el.style.borderRadius = "10px";
+      el.style.zIndex = 90;
+      el.style.boxShadow = "0 10px 30px rgba(2,6,23,0.6)";
+      document.body.appendChild(el);
+      setTimeout(()=> el.style.transform = "translateY(-10px)", 10);
+      setTimeout(()=> el.style.opacity = "0", 1200);
+      setTimeout(()=> el.remove(), 1500);
+    }
+
+    /* -------------------------
+       Bootstrap render
+    -------------------------*/
+    renderProducts();
+    renderCart();
+
+    // small accessibility: close modal on Escape
+    window.addEventListener('keydown', (e)=>{
+      if(e.key === "Escape") {
+        if(backdrop.style.display === "flex") closeModal();
+      }
+    });
+  </script>
+</body>
 </html>
