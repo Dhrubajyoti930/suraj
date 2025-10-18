@@ -1,615 +1,414 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Mini Shop — Demo E-commerce Page</title>
-  <meta name="description" content="Simple responsive e-commerce product page demo with cart" />
-  <style>
-    :root{
-      --bg:#0f1724;
-      --card:#0b1220;
-      --muted:#9aa4b2;
-      --accent:#06b6d4;
-      --accent-2:#7c3aed;
-      --glass: rgba(255,255,255,0.03);
-      --success:#10b981;
-      --danger:#ef4444;
-      --max-width:1200px;
-      --radius:12px;
-      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      background: linear-gradient(180deg,#071025 0%, #081827 55%, #04121b 100%);
-      color:#e6eef6;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      padding:32px;
-      display:flex;
-      justify-content:center;
-      align-items:flex-start;
-      gap:24px;
-      min-height:100vh;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DriveDash - Ride Simulator</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Inter font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Custom Styles for Mobile App Feel */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d0d0d;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
 
-    .container{
-      width:100%;
-      max-width:var(--max-width);
-      display:grid;
-      grid-template-columns: 1fr 360px;
-      gap:24px;
-      align-items:start;
-    }
+        #app-wrapper {
+            width: 100%;
+            height: 100vh;
+            max-width: 450px; /* Standard mobile width constraint */
+            background-color: #1a1a1a;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
 
-    /* MAIN PANEL */
-    main.panel{
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border-radius: var(--radius);
-      padding:20px;
-      box-shadow: 0 6px 30px rgba(2,6,23,0.6);
-      min-height:70vh;
-      overflow:hidden;
-    }
+        /* Simulated Map Area */
+        #map-area {
+            flex-grow: 1;
+            background: linear-gradient(135deg, #1f2937 0%, #0f172a 100%); /* Dark gradient for map feel */
+            position: relative;
+            z-index: 10;
+        }
+        
+        /* Fixed Bottom Panel */
+        #booking-panel {
+            z-index: 20;
+            transition: transform 0.3s ease-in-out;
+            border-top-left-radius: 24px;
+            border-top-right-radius: 24px;
+            box-shadow: 0 -10px 20px rgba(0, 0, 0, 0.4);
+            background-color: #1a1a1a;
+        }
+        
+        /* Custom input dot and line structure */
+        .location-input-group {
+            display: flex;
+            align-items: center;
+            padding: 1rem 0;
+        }
+        .dot-line-container {
+            width: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-right: 12px;
+        }
+        .dot-line-container .dot-pickup {
+            width: 10px;
+            height: 10px;
+            background-color: #4ade80; /* Green for pickup */
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .dot-line-container .dot-dropoff {
+            width: 10px;
+            height: 10px;
+            background-color: #f59e0b; /* Amber for dropoff */
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .dot-line-container .line {
+            width: 2px;
+            height: 30px;
+            background-color: #4b5563; /* Gray line */
+            margin: 4px 0;
+        }
 
-    header.top{
-      display:flex;
-      gap:12px;
-      align-items:center;
-      justify-content:space-between;
-      margin-bottom:14px;
-    }
-    .brand{
-      display:flex;
-      gap:12px;
-      align-items:center;
-    }
-    .logo{
-      width:48px;
-      height:48px;
-      border-radius:10px;
-      display:grid;
-      place-items:center;
-      font-weight:700;
-      color:#021122;
-      background: linear-gradient(135deg,var(--accent),var(--accent-2));
-      box-shadow: 0 4px 18px rgba(124,58,237,0.18);
-    }
-    .title{
-      font-size:18px;
-      line-height:1;
-    }
-    .subtitle{color:var(--muted); font-size:13px}
+        /* Vehicle selection active state */
+        .vehicle-card.active {
+            border-color: #f59e0b !important;
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+            background-color: #262626;
+        }
 
-    .controls{
-      display:flex;
-      gap:8px;
-      align-items:center;
-    }
-    input.search{
-      padding:10px 12px;
-      border-radius:10px;
-      border:1px solid rgba(255,255,255,0.04);
-      background:var(--glass);
-      color:inherit;
-      min-width:220px;
-      outline:none;
-    }
-    .filter-group{
-      display:flex;
-      gap:8px;
-      align-items:center;
-    }
-    select, button.btn{
-      padding:9px 12px;
-      border-radius:10px;
-      border: none;
-      background: rgba(255,255,255,0.03);
-      color:inherit;
-      cursor:pointer;
-      font-weight:600;
-    }
-    button.btn.primary{
-      background: linear-gradient(90deg,var(--accent),var(--accent-2));
-      color:#021122;
-      box-shadow: 0 6px 20px rgba(6,182,212,0.12);
-    }
-    .meta{
-      display:flex;
-      gap:12px;
-      align-items:center;
-      color:var(--muted);
-      font-size:13px;
-    }
+        /* Confirmation Modal Styles */
+        #ride-status-modal {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 50;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
 
-    /* PRODUCT GRID */
-    .products{
-      margin-top:14px;
-      display:grid;
-      grid-template-columns: repeat(auto-fill,minmax(220px,1fr));
-      gap:16px;
-    }
-    .card{
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border-radius:12px;
-      padding:12px;
-      border:1px solid rgba(255,255,255,0.03);
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-      transition:transform .18s ease, box-shadow .18s ease;
-    }
-    .card:hover{ transform:translateY(-6px); box-shadow:0 10px 30px rgba(2,6,23,0.6) }
-    .thumb{
-      height:150px;
-      border-radius:10px;
-      background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      overflow:hidden;
-    }
-    .thumb img{ max-width:100%; max-height:100%; object-fit:cover; display:block }
+        /* Loader Animation */
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid #f59e0b;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
 
-    .info{
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-      flex:1;
-    }
-    .product-title{ font-weight:700; font-size:15px }
-    .product-meta{ color:var(--muted); font-size:13px; display:flex; gap:8px; align-items:center }
-    .price{ font-weight:800; color:var(--accent-2); font-size:16px }
-
-    .card-actions{
-      display:flex;
-      gap:8px;
-      margin-top:auto;
-      align-items:center;
-    }
-    button.icon{
-      background:rgba(255,255,255,0.03);
-      border:none;
-      padding:8px 10px;
-      border-radius:10px;
-      color:inherit;
-      cursor:pointer;
-    }
-
-    /* CART SIDEBAR */
-    aside.cart{
-      position:sticky;
-      top:32px;
-      height:calc(100vh - 64px);
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border-radius:var(--radius);
-      padding:12px;
-      width:100%;
-      max-width:360px;
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-      border:1px solid rgba(255,255,255,0.03);
-    }
-    .cart h3{ margin:0; font-size:18px }
-    .cart-list{ flex:1; overflow:auto; padding-right:6px; display:flex; flex-direction:column; gap:10px }
-    .cart-item{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      padding:8px;
-      border-radius:10px;
-      background: rgba(255,255,255,0.01);
-    }
-    .ci-thumb{ width:60px; height:60px; border-radius:8px; overflow:hidden; background:#031220; display:grid; place-items:center; }
-    .ci-thumb img{ width:100%; height:100%; object-fit:cover }
-    .ci-body{ flex:1 }
-    .ci-title{ font-weight:700; font-size:14px }
-    .ci-meta{ color:var(--muted); font-size:13px; display:flex; gap:8px; align-items:center }
-    .qty-controls{ display:flex; gap:6px; align-items:center; margin-top:6px }
-    .qty-controls button{ width:28px; height:28px; border-radius:8px; background:rgba(255,255,255,0.03); border:none; cursor:pointer; color:inherit }
-    .checkout{
-      display:flex;
-      gap:8px;
-      align-items:center;
-      justify-content:space-between;
-      padding-top:8px;
-      border-top:1px dashed rgba(255,255,255,0.03);
-    }
-    .empty{ color:var(--muted); font-size:14px; text-align:center; padding:20px 6px }
-
-    /* Modal */
-    .modal-backdrop{
-      position:fixed;
-      inset:0;
-      display:none;
-      align-items:center;
-      justify-content:center;
-      z-index:60;
-      background:linear-gradient(0deg, rgba(0,0,0,0.55), rgba(0,0,0,0.55));
-    }
-    .modal{
-      width:92%;
-      max-width:920px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border-radius:14px;
-      padding:20px;
-      box-shadow:0 18px 60px rgba(2,6,23,0.6);
-      display:flex;
-      gap:16px;
-      color:inherit;
-    }
-    .modal .left{ flex:1; min-width:260px }
-    .modal .right{ width:340px; display:flex; flex-direction:column; gap:10px }
-    .modal .thumb{ height:320px; border-radius:12px; }
-    .close-btn{ background:transparent; border:none; color:var(--muted); font-size:20px; cursor:pointer; }
-
-    /* Responsive */
-    @media (max-width:980px){
-      .container{ grid-template-columns: 1fr; padding-bottom:100px }
-      aside.cart{ position:relative; top:auto; height:auto; max-width:none }
-      .modal{ flex-direction:column }
-      .controls input.search{ min-width:140px }
-    }
-  </style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
-  <div class="container" role="main">
-    <main class="panel" aria-labelledby="shop-title">
-      <header class="top">
-        <div class="brand">
-          <div class="logo" aria-hidden="true">MS</div>
-          <div>
-            <div id="shop-title" class="title">Mini Shop</div>
-            <div class="subtitle">Modern demo storefront</div>
-          </div>
+
+    <div id="app-wrapper">
+        <!-- 1. Simulated Map View -->
+        <div id="map-area">
+            <div class="p-4 text-center text-gray-400 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                <p class="font-bold text-lg mb-1">Simulated Map View</p>
+                <p class="text-xs">Your current location is at the center.</p>
+                <div class="w-2 h-2 bg-green-400 rounded-full mx-auto my-2 shadow-lg shadow-green-500/50"></div>
+            </div>
+            
+            <!-- App Bar -->
+            <div class="p-4 flex justify-between items-center text-white bg-transparent absolute top-0 w-full">
+                <h1 class="text-xl font-extrabold text-amber-400">DriveDash</h1>
+                <div class="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center text-sm font-bold">JD</div>
+            </div>
         </div>
 
-        <div class="controls" aria-hidden="false">
-          <input id="q" class="search" type="search" placeholder="Search products, e.g. sneakers" aria-label="Search products" />
-          <div class="filter-group">
-            <select id="category">
-              <option value="">All categories</option>
-            </select>
-            <select id="sort">
-              <option value="featured">Featured</option>
-              <option value="price-asc">Price: Low → High</option>
-              <option value="price-desc">Price: High → Low</option>
-            </select>
-            <button id="clear" class="btn" title="Clear filters">Clear</button>
-          </div>
-        </div>
-      </header>
+        <!-- 2. Booking Panel (Fixed Bottom) -->
+        <div id="booking-panel" class="w-full p-6 text-white">
 
-      <div class="meta">
-        <div id="results-count">Showing all products</div>
-        <div style="margin-left:auto;color:var(--muted);font-size:13px">Free demo checkout • No real payments</div>
-      </div>
+            <!-- Location Inputs -->
+            <div class="mb-4 bg-gray-800 p-4 rounded-xl">
+                <div class="location-input-group">
+                    <div class="dot-line-container">
+                        <div class="dot-pickup"></div>
+                        <div class="line"></div>
+                    </div>
+                    <input type="text" id="pickup-input" value="123 Harmony Heights" placeholder="Enter Pickup Location" 
+                           class="flex-grow bg-transparent border-b border-gray-700 focus:outline-none focus:border-green-400 p-2 text-sm" />
+                </div>
+                <div class="location-input-group !py-0">
+                    <div class="dot-line-container">
+                        <div class="dot-dropoff"></div>
+                    </div>
+                    <input type="text" id="dropoff-input" value="789 Downtown Tower" placeholder="Enter Destination" 
+                           class="flex-grow bg-transparent border-b border-gray-700 focus:outline-none focus:border-amber-400 p-2 text-sm" />
+                </div>
+            </div>
+            
+            <!-- Estimated Price -->
+            <div id="price-estimate" class="text-right text-gray-400 text-sm mb-4">
+                Estimated fare: <span class="text-white font-bold">$15.50 - $18.00</span>
+            </div>
 
-      <section class="products" id="products" aria-live="polite">
-        <!-- product cards injected by JS -->
-      </section>
-    </main>
+            <!-- Vehicle Selection -->
+            <div class="flex justify-between space-x-2 mb-6 overflow-x-auto pb-2">
+                <!-- Vehicle 1: Mini -->
+                <div class="vehicle-card p-3 rounded-xl border-2 border-transparent transition duration-200 cursor-pointer w-1/3 text-center active" data-vehicle="Mini">
+                    <svg class="h-6 w-6 mx-auto mb-1 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 15H5a2 2 0 01-2-2V7a2 2 0 012-2h10a2 2 0 012 2v6a2 2 0 01-2 2h-6zm0 0l3 3m-3-3v3m0 0h3l-3 3" /></svg>
+                    <p class="text-xs font-semibold">Mini</p>
+                    <p class="text-xs text-amber-400 font-bold">$15.50</p>
+                </div>
+                <!-- Vehicle 2: Sedan -->
+                <div class="vehicle-card p-3 rounded-xl border-2 border-transparent transition duration-200 cursor-pointer w-1/3 text-center" data-vehicle="Sedan">
+                    <svg class="h-6 w-6 mx-auto mb-1 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15H9m3 0v3m0-3l-3 3m3-3h3m-3 0v-3" /></svg>
+                    <p class="text-xs font-semibold">Sedan</p>
+                    <p class="text-xs text-gray-300 font-bold">$18.00</p>
+                </div>
+                <!-- Vehicle 3: SUV -->
+                <div class="vehicle-card p-3 rounded-xl border-2 border-transparent transition duration-200 cursor-pointer w-1/3 text-center" data-vehicle="SUV">
+                    <svg class="h-6 w-6 mx-auto mb-1 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 13h18M3 8h18M3 18h18M10 3v2h4V3h-4zm0 16v2h4v-2h-4z" /></svg>
+                    <p class="text-xs font-semibold">SUV</p>
+                    <p class="text-xs text-gray-300 font-bold">$25.00</p>
+                </div>
+            </div>
 
-    <aside class="cart" aria-labelledby="cart-title">
-      <h3 id="cart-title">Your Cart</h3>
-      <div id="cart-list" class="cart-list" role="list">
-        <div class="empty">Your cart is empty — add items from the shop</div>
-      </div>
+            <!-- Booking Button -->
+            <button id="book-ride-btn"
+                    class="w-full bg-amber-500 hover:bg-amber-600 text-gray-900 font-extrabold py-4 rounded-xl shadow-xl shadow-amber-500/30 transition duration-150 ease-in-out active:scale-[0.98]">
+                BOOK MINI
+            </button>
+        </div>
+        
+        <!-- 3. Ride Status Modal (Hidden by Default) -->
+        <div id="ride-status-modal" style="display: none;">
+            <div id="modal-content" class="bg-gray-800 p-8 rounded-xl w-11/12 max-w-sm">
+                <div class="flex justify-center">
+                    <div id="modal-spinner" class="spinner"></div>
+                </div>
+                <h2 id="modal-title" class="text-2xl font-bold mb-3 text-white">Searching for Ride...</h2>
+                <p id="modal-message" class="text-gray-400 mb-6">Connecting you with the nearest driver...</p>
+                
+                <div id="driver-details" class="hidden bg-gray-900 p-4 rounded-lg border border-amber-500">
+                    <p class="text-xs font-semibold text-amber-500 mb-1">DRIVER FOUND!</p>
+                    <p class="text-lg font-bold mb-1">Ramesh K.</p>
+                    <p class="text-sm text-gray-400">Vehicle: <span id="driver-car">Maruti Swift - Mini</span></p>
+                    <p class="text-sm text-gray-400">License Plate: <span id="driver-plate">KA 01 AB 1234</span></p>
+                    <p class="text-xs text-green-400 mt-2">Arriving in <span id="arrival-time">3 minutes</span></p>
+                </div>
+                
+                <button id="modal-close-btn" class="mt-6 w-full bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 rounded-lg transition duration-150 ease-in-out hidden">
+                    Close
+                </button>
+            </div>
+        </div>
 
-      <div class="checkout">
-        <div>
-          <div style="color:var(--muted);font-size:13px">Subtotal</div>
-          <div id="subtotal" style="font-weight:800;font-size:18px">₹0.00</div>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:8px">
-          <button id="checkout-btn" class="btn primary">Checkout</button>
-          <button id="empty-btn" class="btn" style="background:transparent;border:1px solid rgba(255,255,255,0.03)">Empty</button>
-        </div>
-      </div>
-    </aside>
-  </div>
-
-  <!-- Modal -->
-  <div id="modal-backdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
-    <div class="modal" role="document">
-      <div class="left">
-        <button id="modal-close" class="close-btn" aria-label="Close">&times;</button>
-        <div class="thumb" id="modal-thumb"></div>
-      </div>
-      <div class="right">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div>
-            <div id="modal-title" style="font-weight:800;font-size:18px"></div>
-            <div id="modal-cat" style="color:var(--muted);font-size:13px"></div>
-          </div>
-        </div>
-        <div id="modal-desc" style="color:var(--muted);font-size:14px"></div>
-        <div id="modal-price" style="font-size:20px;font-weight:800;color:var(--accent-2)"></div>
-        <div style="display:flex;gap:8px;margin-top:auto">
-          <button id="modal-add" class="btn primary">Add to cart</button>
-          <button id="modal-close-2" class="btn">Close</button>
-        </div>
-      </div>
     </div>
-  </div>
 
-  <script>
-    /* -------------------------
-       Sample product data
-       Edit or extend this array to add your own items.
-       Images use unsplash placeholders for demo.
-    -------------------------*/
-    const products = [
-      { id: "p1", title: "Atlas Sneakers", price: 3499, category:"Footwear", img:"https://images.unsplash.com/photo-1585386959984-a4155227c8d9?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=1" , desc:"Street-ready sneakers with cushioned sole."},
-      { id: "p2", title: "Nimbus Hoodie", price: 1999, category:"Apparel", img:"https://images.unsplash.com/photo-1512436991641-6745cdb1723f?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=2", desc:"Ultra-soft cotton hoodie for everyday comfort."},
-      { id: "p3", title: "Aurora Backpack", price: 2599, category:"Accessories", img:"https://images.unsplash.com/photo-1533658925621-8bb1a6d6f019?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=3", desc:"Water-resistant pack with laptop sleeve."},
-      { id: "p4", title: "Sol Sunglasses", price: 1299, category:"Accessories", img:"https://images.unsplash.com/photo-1520975698514-3a2c639f4c62?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=4", desc:"Polarized lenses with modern frames."},
-      { id: "p5", title: "Comet Tee", price: 799, category:"Apparel", img:"https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=5", desc:"Lightweight breathable tee."},
-      { id: "p6", title: "Trail Runner", price: 4299, category:"Footwear", img:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=6", desc:"Performance shoes built for trails."},
-    ];
+    <script>
+        // --- State Management ---
+        let appState = {
+            pickup: "123 Harmony Heights",
+            dropoff: "789 Downtown Tower",
+            selectedVehicle: {
+                name: "Mini",
+                price: 15.50
+            },
+            vehicles: [
+                { name: "Mini", price: 15.50, svg: '<svg class="h-6 w-6 mx-auto mb-1 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 15H5a2 2 0 01-2-2V7a2 2 0 012-2h10a2 2 0 012 2v6a2 2 0 01-2 2h-6zm0 0l3 3m-3-3v3m0 0h3l-3 3" /></svg>' },
+                { name: "Sedan", price: 18.00, svg: '<svg class="h-6 w-6 mx-auto mb-1 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15H9m3 0v3m0-3l-3 3m3-3h3m-3 0v-3" /></svg>' },
+                { name: "SUV", price: 25.00, svg: '<svg class="h-6 w-6 mx-auto mb-1 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 13h18M3 8h18M3 18h18M10 3v2h4V3h-4zm0 16v2h4v-2h-4z" /></svg>' }
+            ],
+            isBooking: false
+        };
 
-    /* -------------------------
-       State & helpers
-    -------------------------*/
-    let state = {
-      q: "",
-      category: "",
-      sort: "featured",
-      cart: JSON.parse(localStorage.getItem("mini_cart") || "{}")
-    };
+        // --- DOM Elements ---
+        const pickupInput = document.getElementById('pickup-input');
+        const dropoffInput = document.getElementById('dropoff-input');
+        const priceEstimateEl = document.getElementById('price-estimate');
+        const vehicleCards = document.querySelectorAll('.vehicle-card');
+        const bookRideBtn = document.getElementById('book-ride-btn');
+        const modal = document.getElementById('ride-status-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalMessage = document.getElementById('modal-message');
+        const modalSpinner = document.getElementById('modal-spinner');
+        const modalCloseBtn = document.getElementById('modal-close-btn');
+        const driverDetailsEl = document.getElementById('driver-details');
+        const driverCarEl = document.getElementById('driver-car');
+        const driverPlateEl = document.getElementById('driver-plate');
+        const arrivalTimeEl = document.getElementById('arrival-time');
 
-    function saveCart(){
-      localStorage.setItem("mini_cart", JSON.stringify(state.cart));
-      renderCart();
-    }
 
-    function currency(n){
-      // Indian Rupee symbol used — change as needed
-      return "₹" + Number(n).toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2});
-    }
+        // --- UI Update Functions ---
 
-    /* -------------------------
-       Init category filter
-    -------------------------*/
-    const categoryEl = document.getElementById("category");
-    const allCats = Array.from(new Set(products.map(p=>p.category)));
-    allCats.forEach(cat=>{
-      const opt = document.createElement("option");
-      opt.value = cat; opt.textContent = cat;
-      categoryEl.appendChild(opt);
-    });
+        function updateVehicleSelectionUI(selectedName) {
+            vehicleCards.forEach(card => {
+                const vehicleName = card.dataset.vehicle;
+                const vehicleData = appState.vehicles.find(v => v.name === vehicleName);
 
-    /* -------------------------
-       Render products
-    -------------------------*/
-    const productsEl = document.getElementById("products");
-    function renderProducts(){
-      const q = state.q.trim().toLowerCase();
-      let list = products.filter(p=>{
-        if(state.category && p.category !== state.category) return false;
-        if(!q) return true;
-        return (p.title + " " + (p.desc||"") + " " + p.category).toLowerCase().includes(q);
-      });
+                // Update styling (active/inactive)
+                if (vehicleName === selectedName) {
+                    card.classList.add('active');
+                    // Update content colors for active state
+                    card.querySelector('svg').classList.replace('text-gray-300', 'text-amber-400');
+                    card.querySelector('.text-xs:not(.text-amber-400)').classList.add('text-amber-400');
+                } else {
+                    card.classList.remove('active');
+                    // Reset content colors for inactive state
+                    card.querySelector('svg').classList.replace('text-amber-400', 'text-gray-300');
+                    card.querySelector('.text-xs:not(.text-amber-400)').classList.remove('text-amber-400');
+                }
+            });
+        }
 
-      if(state.sort === "price-asc") list.sort((a,b)=>a.price-b.price);
-      if(state.sort === "price-desc") list.sort((a,b)=>b.price-a.price);
-      // else featured keep original order
+        function renderApp() {
+            // Update button text
+            bookRideBtn.textContent = `BOOK ${appState.selectedVehicle.name.toUpperCase()} - $${appState.selectedVehicle.price.toFixed(2)}`;
 
-      productsEl.innerHTML = "";
-      document.getElementById("results-count").textContent = `Showing ${list.length} product${list.length!==1?"s":""}`;
+            // Update price estimate text (simple simulation)
+            const minPrice = appState.selectedVehicle.price;
+            const maxPrice = minPrice + 2.5; // Simulate a price range
+            priceEstimateEl.innerHTML = `Estimated fare: <span class="text-white font-bold">$${minPrice.toFixed(2)} - $${maxPrice.toFixed(2)}</span>`;
 
-      if(list.length===0){
-        productsEl.innerHTML = `<div style="grid-column:1/-1;color:var(--muted);padding:30px;border-radius:10px;background:rgba(255,255,255,0.01);text-align:center">No products match your filters</div>`;
-        return;
-      }
+            // Update vehicle selection UI
+            updateVehicleSelectionUI(appState.selectedVehicle.name);
+        }
 
-      list.forEach(p=>{
-        const card = document.createElement("article");
-        card.className = "card";
-        card.innerHTML = `
-          <div class="thumb" aria-hidden="true"><img loading="lazy" src="${p.img}" alt="${escapeHtml(p.title)}"></div>
-          <div class="info">
-            <div style="display:flex;justify-content:space-between;gap:10px">
-              <div class="product-title">${escapeHtml(p.title)}</div>
-              <div class="price">${currency(p.price)}</div>
-            </div>
-            <div class="product-meta"><span>${escapeHtml(p.category)}</span><span> • </span><span style="color:var(--muted)">${truncate(p.desc||"",60)}</span></div>
-          </div>
-          <div class="card-actions">
-            <button class="icon" data-action="view" aria-label="Quick view ${escapeHtml(p.title)}">👁️ View</button>
-            <button class="icon" data-action="add" aria-label="Add ${escapeHtml(p.title)} to cart">➕ Add</button>
-          </div>
-        `;
-        // event delegation below
-        productsEl.appendChild(card);
+        // --- Event Handlers ---
 
-        card.querySelector('[data-action="view"]').addEventListener('click', ()=> openModal(p.id));
-        card.querySelector('[data-action="add"]').addEventListener('click', ()=> {
-          addToCart(p.id,1);
-        });
-      });
-    }
+        function handleVehicleSelect(e) {
+            let target = e.currentTarget;
+            if (!target.classList.contains('vehicle-card')) {
+                // Find parent if click was on inner element
+                target = target.closest('.vehicle-card');
+            }
+            const selectedName = target.dataset.vehicle;
+            const newVehicle = appState.vehicles.find(v => v.name === selectedName);
 
-    /* -------------------------
-       Cart functions
-    -------------------------*/
-    function addToCart(pid, qty=1){
-      const existing = state.cart[pid] || 0;
-      state.cart[pid] = existing + qty;
-      saveCart();
-      animateAdd();
-    }
+            if (newVehicle) {
+                appState.selectedVehicle = newVehicle;
+                renderApp();
+            }
+        }
 
-    function removeFromCart(pid){
-      delete state.cart[pid];
-      saveCart();
-    }
+        function updateLocationState() {
+            appState.pickup = pickupInput.value;
+            appState.dropoff = dropoffInput.value;
+        }
+        
+        // --- Booking Simulation Logic ---
 
-    function changeQty(pid, qty){
-      if(qty <= 0) removeFromCart(pid);
-      else state.cart[pid] = qty;
-      saveCart();
-    }
+        function simulateBooking() {
+            if (appState.isBooking) return;
 
-    function cartItems(){
-      return Object.entries(state.cart).map(([pid,qty])=>{
-        const product = products.find(p=>p.id===pid);
-        return { product, qty };
-      }).filter(i=>i.product);
-    }
+            updateLocationState();
+            
+            if (!appState.pickup || !appState.dropoff) {
+                // Simple validation check
+                alert("Please enter both Pickup and Drop-off locations.");
+                return;
+            }
 
-    function renderCart(){
-      const el = document.getElementById("cart-list");
-      el.innerHTML = "";
-      const items = cartItems();
-      if(items.length === 0){
-        el.innerHTML = `<div class="empty">Your cart is empty — add items from the shop</div>`;
-        document.getElementById("subtotal").textContent = currency(0);
-        return;
-      }
-      let subtotal = 0;
-      items.forEach(({product,qty})=>{
-        subtotal += product.price * qty;
-        const item = document.createElement("div");
-        item.className = "cart-item";
-        item.innerHTML = `
-          <div class="ci-thumb"><img src="${product.img}" alt="${escapeHtml(product.title)}"></div>
-          <div class="ci-body">
-            <div class="ci-title">${escapeHtml(product.title)}</div>
-            <div class="ci-meta">${currency(product.price)} • ${product.category}</div>
-            <div class="qty-controls">
-              <button class="qty-dec" aria-label="Decrease quantity">−</button>
-              <div style="min-width:30px;text-align:center">${qty}</div>
-              <button class="qty-inc" aria-label="Increase quantity">+</button>
-              <button class="btn" style="margin-left:8px;padding:6px 8px;font-size:13px" data-remove>Remove</button>
-            </div>
-          </div>
-        `;
-        item.querySelector('.qty-dec').addEventListener('click', ()=> changeQty(product.id, qty-1));
-        item.querySelector('.qty-inc').addEventListener('click', ()=> changeQty(product.id, qty+1));
-        item.querySelector('[data-remove]').addEventListener('click', ()=> removeFromCart(product.id));
-        el.appendChild(item);
-      });
-      document.getElementById("subtotal").textContent = currency(subtotal);
-    }
+            appState.isBooking = true;
+            bookRideBtn.disabled = true;
+            bookRideBtn.textContent = "SEARCHING...";
+            
+            // Show Modal and reset details
+            modal.style.display = 'flex';
+            modalTitle.textContent = "Searching for Ride...";
+            modalMessage.textContent = "Connecting you with the nearest driver...";
+            modalSpinner.style.display = 'block';
+            driverDetailsEl.classList.add('hidden');
+            modalCloseBtn.classList.add('hidden');
+            
+            // --- Step 1: Searching (0.5 seconds) ---
+            setTimeout(() => {
+                modalMessage.textContent = "Checking driver availability for a " + appState.selectedVehicle.name + "...";
+            }, 500);
 
-    /* -------------------------
-       Modal (quick view)
-    -------------------------*/
-    const backdrop = document.getElementById("modal-backdrop");
-    function openModal(pid){
-      const p = products.find(x=>x.id===pid); if(!p) return;
-      document.getElementById("modal-title").textContent = p.title;
-      document.getElementById("modal-cat").textContent = p.category;
-      document.getElementById("modal-desc").textContent = p.desc || "";
-      document.getElementById("modal-price").textContent = currency(p.price);
-      const thumb = document.getElementById("modal-thumb");
-      thumb.innerHTML = `<img src="${p.img}" alt="${escapeHtml(p.title)}" style="width:100%;height:100%;object-fit:cover;border-radius:8px">`;
-      backdrop.style.display = "flex";
-      backdrop.setAttribute("aria-hidden","false");
-      // attach add handler
-      document.getElementById("modal-add").onclick = ()=> {
-        addToCart(p.id,1);
-        closeModal();
-      };
-    }
-    function closeModal(){
-      backdrop.style.display = "none";
-      backdrop.setAttribute("aria-hidden","true");
-    }
+            // --- Step 2: Driver Found (2 seconds) ---
+            setTimeout(() => {
+                modalTitle.textContent = "Driver Found! 🎉";
+                modalMessage.textContent = "Your driver is on the way to your pickup location.";
+                modalSpinner.style.display = 'none';
+                
+                // Populate and show driver details
+                driverCarEl.textContent = getDriverCar(appState.selectedVehicle.name);
+                driverPlateEl.textContent = generateLicensePlate();
+                arrivalTimeEl.textContent = (Math.floor(Math.random() * 5) + 2) + " minutes";
+                driverDetailsEl.classList.remove('hidden');
+                
+            }, 2000);
 
-    document.getElementById("modal-close").addEventListener('click', closeModal);
-    document.getElementById("modal-close-2").addEventListener('click', closeModal);
-    backdrop.addEventListener('click', (e)=> { if(e.target === backdrop) closeModal(); });
+            // --- Step 3: Confirmation/Closure (5 seconds) ---
+            setTimeout(() => {
+                modalTitle.textContent = "Ride Confirmed";
+                modalMessage.textContent = "Enjoy your ride! View map for real-time location.";
+                modalCloseBtn.classList.remove('hidden');
+                appState.isBooking = false;
+                renderApp(); // Re-enable book button if needed later
+            }, 5000);
+        }
 
-    /* -------------------------
-       UI: search/filter/sort
-    -------------------------*/
-    const qEl = document.getElementById("q");
-    qEl.addEventListener('input', (e)=> {
-      state.q = e.target.value;
-      renderProducts();
-    });
-    categoryEl.addEventListener('change', (e)=> {
-      state.category = e.target.value;
-      renderProducts();
-    });
-    document.getElementById("sort").addEventListener('change', (e)=> {
-      state.sort = e.target.value;
-      renderProducts();
-    });
-    document.getElementById("clear").addEventListener('click', ()=> {
-      state.q = "";
-      state.category = "";
-      state.sort = "featured";
-      qEl.value = "";
-      categoryEl.value = "";
-      document.getElementById("sort").value = "featured";
-      renderProducts();
-    });
+        function getDriverCar(vehicleType) {
+            switch(vehicleType) {
+                case 'Mini': return 'Maruti Swift - Mini';
+                case 'Sedan': return 'Hyundai Verna - Sedan';
+                case 'SUV': return 'Toyota Innova - SUV';
+                default: return 'Standard Car';
+            }
+        }
 
-    /* -------------------------
-       Empty / Checkout buttons
-    -------------------------*/
-    document.getElementById("empty-btn").addEventListener('click', ()=>{
-      if(confirm("Empty your cart?")) { state.cart = {}; saveCart(); }
-    });
-    document.getElementById("checkout-btn").addEventListener('click', ()=>{
-      const items = cartItems();
-      if(items.length === 0){ alert("Your cart is empty"); return; }
-      // Demo checkout flow (no real payments)
-      let text = "You're checking out the following items:\\n\\n";
-      items.forEach(({product,qty})=>{
-        text += `${product.title} x ${qty} — ${currency(product.price * qty)}\\n`;
-      });
-      text += `\\nSubtotal: ${document.getElementById("subtotal").textContent}\\n\\nThis is a demo. Press OK to simulate order placement.`;
-      if(confirm(text)){
-        alert("Order placed — thanks! (Demo)");
-        state.cart = {};
-        saveCart();
-      }
-    });
+        function generateLicensePlate() {
+            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            const numbers = '0123456789';
+            let plate = 'KA ' + numbers[Math.floor(Math.random() * 10)] + numbers[Math.floor(Math.random() * 10)] + ' ';
+            plate += letters[Math.floor(Math.random() * 26)] + letters[Math.floor(Math.random() * 26)] + ' ';
+            plate += numbers[Math.floor(Math.random() * 10)] + numbers[Math.floor(Math.random() * 10)] + numbers[Math.floor(Math.random() * 10)] + numbers[Math.floor(Math.random() * 10)];
+            return plate;
+        }
 
-    /* -------------------------
-       Utilities
-    -------------------------*/
-    function truncate(s,n){ return s.length>n ? s.slice(0,n-1) + "…" : s; }
-    function escapeHtml(s){ return s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;'); }
+        function closeModal() {
+            modal.style.display = 'none';
+        }
 
-    /* Simple animation when adding to cart */
-    function animateAdd(){
-      const el = document.createElement('div');
-      el.textContent = "Added ✓";
-      el.style.position = "fixed";
-      el.style.right = "24px";
-      el.style.bottom = "24px";
-      el.style.padding = "10px 14px";
-      el.style.background = "linear-gradient(90deg,var(--accent),var(--accent-2))";
-      el.style.color = "#021122";
-      el.style.borderRadius = "10px";
-      el.style.zIndex = 90;
-      el.style.boxShadow = "0 10px 30px rgba(2,6,23,0.6)";
-      document.body.appendChild(el);
-      setTimeout(()=> el.style.transform = "translateY(-10px)", 10);
-      setTimeout(()=> el.style.opacity = "0", 1200);
-      setTimeout(()=> el.remove(), 1500);
-    }
+        // --- Initialization ---
+        function init() {
+            // Set initial input values
+            pickupInput.value = appState.pickup;
+            dropoffInput.value = appState.dropoff;
 
-    /* -------------------------
-       Bootstrap render
-    -------------------------*/
-    renderProducts();
-    renderCart();
+            // Attach event listeners
+            vehicleCards.forEach(card => card.addEventListener('click', handleVehicleSelect));
+            bookRideBtn.addEventListener('click', simulateBooking);
+            modalCloseBtn.addEventListener('click', closeModal);
+            
+            // Initial render
+            renderApp();
+        }
 
-    // small accessibility: close modal on Escape
-    window.addEventListener('keydown', (e)=>{
-      if(e.key === "Escape") {
-        if(backdrop.style.display === "flex") closeModal();
-      }
-    });
-  </script>
+        window.onload = init;
+
+    </script>
 </body>
 </html>
